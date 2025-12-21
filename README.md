@@ -1,2 +1,146 @@
-# xbts-ui-releases
-XBTS UI Advanced Wallet Releases
+## XBTS DEX UI v2
+
+v1.0.1
+
+- **Enhanced Key Security & Code Refactoring:** Significantly improved key generation security by implementing Key Stretching (PBKDF2 with 40,000 iterations using SHA512) for password-derived keys. The password generation logic has been refactored and centralized in `accountStore.ts` for better maintainability and clearer separation of concerns.
+- **Localization:** Added support for multiple languages including Chinese (cn), German (de), Spanish (es), French (fr), Portuguese (pt), and Arabic (ar) in addition to existing English (en) and Russian (ru)
+- **Tauri Integration:** Added support for Rust-based UI framework (Tauri) which provides significantly faster performance and better efficiency compared to Electron
+- **Settings Enhancement:** Implemented "Reset All" functionality as a dedicated section in the settings page, providing users with an easy way to reset wallet data and accounts
+- **Real-time Market Updates:** Replaced polling with a real-time, event-driven architecture by subscribing to blockchain object updates. This provides instant ticker updates in the `MarketPicker` without high network load or UI freezes.
+- **Architectural Refactor:** Decoupled market update logic from the `walletStore` and centralized it within the `marketStore`. A global subscription handler in `walletStore` now delegates market-related events to `marketStore` for processing, ensuring clean separation of concerns.
+- **Efficient Event Parsing:** Implemented a new `handleGlobalUpdate` action in `marketStore` to parse incoming blockchain operations (`limit_order_create`, `fill_order`, `limit_order_cancel`, etc.) and trigger targeted, real-time updates only for the affected market tickers.
+- **Order Book UX:** Added highlighting for the current user's open orders in the buy and sell order books for better visibility.
+- **Order Book UX:** Implemented in-place order cancellation directly from the order book. Users can now click a "cancel" icon on their own orders, which opens a new confirmation modal displaying transaction details and fees before broadcasting.
+- **Transactional Modals:** Created a new, reusable `CancelOrderModal` and refactored the transaction flow to use a two-step process (`prepareCancelOrder` and `broadcastTransaction`), allowing users to review fees before confirming.
+- **Instant UI Feedback:** Ensured the UI updates immediately after a successful order cancellation by re-fetching the order book and the user's open orders.
+- **Trading:** Implemented "click-to-fill" functionality, allowing users to click on orders in the order book to automatically populate the buy/sell form fields.
+- **Trading:** Implemented a two-step order placement process with a confirmation modal that displays fee, expiration, and other details before broadcasting the transaction.
+- **Trading:** Added success and error toast notifications for order placement.
+- **Trading:** Refactored order creation and cancellation logic to be more robust and centralized in the `transactionStore`.
+- **Trading:** Added a modal to display the user's open orders, accessible from the `OrderForm`.
+- **Assets:** Added a tooltip to asset symbols to display their description on hover.
+- **Header:** Replaced static market widgets with a dynamic list of the top 4 markets by 24h volume against `XBTSX.USDT`.
+- **Header:** Fixed an issue where prices in the new market widgets were inverted.
+- **Portfolio:** Fixed a critical bug where new accounts or accounts receiving their first asset would not display balances in real-time.
+- **Portfolio:** Implemented a "flash" animation on the quantity cell to provide non-disruptive visual feedback for balance changes.
+- **Order Book:** Fixed a critical bug causing the buy/sell order books to invert their prices after a new order was placed.
+- **Chart:** The candlestick chart now uses the correct `get_market_history` data source, improving accuracy and performance.
+- **Chart:** The market history chart now updates in real-time when new trades occur for the subscribed market.
+- **Chart:** Improved Y-axis price label formatting to use dynamic precision and abbreviate large numbers (e.g., 10K).
+- **Trading:** Improved the layout of the sell order form header by correctly aligning the title and action buttons.
+- **Explorer:** Added a "Market History" tool to fetch and display raw OHLCV data.
+- **Portfolio:** Resolved a UI flicker issue where the entire table would jerk during background updates.
+- Spot Trading Terminal: Implemented a new, modern spot trading terminal interface.
+- Spot Trading Terminal: Introduced a CSS Grid-based layout (`TradeLayoutDefault.vue`) for a flexible and responsive trading experience.
+- Spot Trading Terminal: Added a `PairInfo` component to display real-time ticker data for the selected market, including price, 24h change, and volume.
+- Spot Trading Terminal: Implemented a `MarketPicker` component with tabs for different quote markets (e.g., BTS, HIVE) and a searchable list of all available trading pairs.
+- Spot Trading Terminal: Enabled real-time UI updates by subscribing to market events (`subscribe_to_market`) from the BitShares blockchain.
+- Spot Trading Terminal: Developed a robust event parser to handle multiple notification formats from the node, ensuring reliable updates for new orders, filled orders, and other market activities.
+- Spot Trading Terminal: Implemented a "Favorites" feature, allowing users to star/unstar markets for quick access. Favorite markets are persisted in local storage.
+- Spot Trading Terminal: Fixed several race conditions and reactivity issues related to data fetching and real-time updates, ensuring a smooth and responsive user experience.
+- Gateway Integration: Implemented comprehensive gateway integration for deposits and withdrawals, supporting multiple blockchain networks (ETH, BSC, EOS, TON, WAVES, etc.) via XBTSX gateway.
+- Gateway Integration: Introduced `gatewayStore` for managing gateway data, including asset information, fees, and minimum amounts.
+- Gateway Integration: Enabled dynamic selection of blockchain networks for deposits and withdrawals.
+- Gateway Integration: Implemented address validation for gateway deposits and withdrawals.
+- Gateway Integration: Added caching for deposit addresses to improve user experience.
+- Implemented a new "Transfer" modal for sending any available asset to another BitShares user.
+- Transfer modal features a two-step process: input details (recipient, amount, optional memo) and transaction confirmation.
+- Transfer modal utilizes `transactionStore.prepareTransfer` and `transactionStore.broadcastTransaction` for secure transfers.
+- Transfer modal includes a check for sufficient BTS balance to cover transaction fees, preventing failed transfers.
+- Transfer modal integrated into `AccountPortfolio.vue` with a dedicated "Send" icon for each asset.
+- Deposit Page Enhancements: Added special handling for native BTS deposits, displaying the user's BitShares account name as the deposit address, bypassing gateway requests.
+- Withdraw Page Enhancements: Implemented distinct forms for gateway-backed assets and native BTS withdrawals.
+- Withdraw Page Enhancements: For native BTS withdrawals, allows direct transfer to another BitShares user with recipient name, amount, and optional memo.
+- Withdraw Page Enhancements: Enhanced memo handling for gateway withdrawals, now correctly includes optional user-provided memos if the gateway supports it (`memoSupport: true`).
+- Identicon Avatar: Integrated dynamic Identicon avatars in the profile header, representing the current account name.
+- Identicon Avatar: Ensured the avatar is reactive and updates automatically when the active account changes.
+- Added Explorer page with various blockchain data lookup tools (Fees, Block by ID, Account by Name, Asset Info, Operation Info, Market Info, Limit Orders, Settle Orders, Short Orders, Margin Positions, Collateral Bids, Liquidity Pools, Worker Proposals, Witnesses, Committee Members, Vesting Balances, Withdraw Permissions, Proposals, Budget Records, Market Ticker).
+- Implemented a new Settings page with vertical tabs for application configuration.
+- Settings page includes a "General" tab for general application settings (language, theme, etc.).
+- Settings page includes a "Nodes" tab for managing BitShares blockchain nodes.
+- Nodes management functionality includes:
+    - Display of the currently active node with its details (URL, location, ping, status).
+    - Ability to re-check all available nodes for latency.
+    - Three sub-tabs: "Available Nodes", "Personal Nodes", and "Hidden Nodes".
+    - "Available Nodes" tab lists configured nodes with options to connect or hide.
+    - "Personal Nodes" tab allows users to add, connect to, and remove custom node URLs.
+    - "Hidden Nodes" tab lists previously hidden nodes with an option to show them again.
+    - Node connection logic now supports direct connection to a specific node from the list.
+    - Node management state (personal and hidden nodes) is persisted in local storage.
+    - Improved node connection stability and error handling.
+- Fixed an issue causing constant reconnections and false watchdog triggers due to incorrect `clear_filter` parameter in `set_subscribe_callback`.
+- Resolved connection conflicts during node ping checks by implementing an independent WebSocket-based ping measurement, ensuring the main blockchain connection remains stable.
+- Fixed Vue warning: "Vue received a Component that was made a reactive object" in `Explorer.vue` by using `markRaw` for component references in the tabs array.
+- Fixed `ReferenceError: BitShares is not defined` in `useNodeManager.ts` by adding the missing `BitShares` import.
+- Fixed active tab styling in Settings page to correctly highlight the active tab with the theme's default color.
+- Implemented activity caching by `account_name` in `activityStore.ts` to prevent re-loading data when switching between accounts.
+- Refactored `activityStore.ts` to use a `cachedActivities` object instead of `allActivities` and `isInitialLoad`.
+- Adapted `Activity.vue` to work with the new caching mechanism in `activityStore.ts`.
+- Removed redundant `loadAccountHistory` from `walletStore.ts` and updated calls to `activityStore.loadAccountHistory`.
+- Refactor `walletStore.ts` to use `deepSearch` instead of `JSON.stringify` in `handleSubscriptionData` for improved performance and memory efficiency during blockchain updates.
+- Optimize `assetStore.ts` by ensuring correct data caching and persistence, and removing redundant connection checks.
+- Refine `nodeStore.ts` to prevent unnecessary connection status changes and overlay flickering by optimizing `init()` and `connectToNodeByIndex()` logic.
+- Implement a more user-friendly loading experience in `Activity.vue`: show loading spinner only on initial data fetch, and animate new activity entries using `TransitionGroup` for smoother updates.
+- Introduce controlled animation for activity table pagination in `Activity.vue`, disabling animation during page changes for better UX.
+- Speed up activity list animation by reducing transition duration to 0.25s.
+- Ensure all data updates (balances, orders, activity) are correctly triggered by blockchain events without causing UI disruptions.
+- Implemented asset store persistence using custom serializer for Map objects, ensuring correct asset data restoration after page refresh.
+- Fixed portfolio display issue by explicitly making `processedBalances` in `Account.vue` reactive to `assetStore.assets`.
+- Enhanced `walletStore` to manage loading states (`loading`, `loadingOrders`) for balances and open orders, improving UX during data fetching.
+- Corrected asset data fetching in `walletStore.loadOpenOrders` to ensure all necessary asset information is loaded before rendering.
+- Updated `AccountOrders.vue` and `AccountPortfolio.vue` to display loading indicators while data is being fetched, preventing UI errors due to asynchronous operations.
+- Added Asset component (Asset.vue) with support for displaying asset icons and symbols, including XBTSX. prefixed assets with proper prefix removal for display
+- Added option to hide zero balances in portfolio table with checkbox control
+- Fixed logic for hide zero balances checkbox - now properly hides/shows zero balances based on checkbox state
+- Added asset type filtering (XBTS Assets, Pools, Native Tokens, Other) with icon radio buttons in portfolio
+- Added border tabs navigation to account page with Portfolio, Open Orders, and Activity sections
+- Combined asset search and asset type filter into input group with dropdown menu
+- Added special display for liquidity pools with dedicated icon
+- Created asset information page with route /asset/:asset_name showing blockchain data
+- Created dedicated store for asset management with caching and API logic
+- Improved connection management with automatic reconnection, watchdog and centralized control
+- Added loading overlay with connection status during blockchain initialization
+- Implemented saving of last successfully connected node and priority connection to it on restart
+- Fixed redundant node checking when connecting to saved preferred node
+- Added open orders retrieval and display for current account in Open Orders tab
+- Enhanced transaction history display in Activity tab with human-readable descriptions (e.g., "account sent amount asset to account")
+- Implemented memo decryption with proper display of decrypted messages in transaction history
+- Optimized blockchain data retrieval with batch requests for improved performance
+- Added colored badges for operation types (green for transfers, blue for orders, etc.)
+- Implemented efficient caching for account names and asset data
+- Enhanced transfer operations display showing sender, recipient, amount, asset symbol, and memo
+- Added account activity history tab with transaction history and order tracking
+- Implemented operations ID mapping from local config to avoid library dependency for operation identification
+- Used correct API method for account history retrieval (get_account_history with proper parameters)
+- Added debug page with JSON display of account operation history for development and debugging purposes
+- Added lifetime member indicator (cup icon) for accounts with lifetime membership in account list
+- Implemented universal confirmation modal component (ConfirmationModal.vue) with customizable title and message
+- Added account deletion logic with check that account is not currently active (switch to another account first)
+- Added lifetime member indicator (cup icon) for accounts with lifetime membership in account list
+- Implemented pagination, search and filtering for open orders table with dropdown menu
+- Combined asset search and type filters into single input group with dropdown for orders table
+- Improved error handling for open orders loading with proper display of error state in UI
+
+v1.0.0
+
+- Added more secure seed phrase generation method
+- Improved user interface
+- Fixed bugs in token swap module
+- Optimized application performance
+- Added support for new cryptocurrencies
+- Improved project documentation
+- Updated dependencies to latest versions
+- Implemented new security features to protect user data
+- Improved compatibility with various devices and browsers
+- Added ability to customize user interface
+- Optimized registration and login process
+- Fixed bugs in wallet management module
+- Improved user notification system
+- Added multilingual support
+- Improved integration with external services
+- Optimized database operations
+- Fixed bugs in analytics module
+- Improved data backup system
+- Added Themify Icons
+- Localized NodeStatus.vue: Implemented internationalization for NodeStatus component, including connection status, ping, and block height displays.
+ 
