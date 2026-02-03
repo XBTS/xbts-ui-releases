@@ -1,7 +1,26 @@
 ## XBTS DEX UI v2
 
-v1.0.1
+v1.0.2
+- Add android build support
+- **Themify Icons:** Integrated Themify Icons library for enhanced iconography across the application.
+- **Node Status Localization:** Implemented internationalization for the NodeStatus component, including connection status
+- **Mobile Experience:** Implemented blur effect for total portfolio value, toggled by an eye icon, to enhance privacy and user control over sensitive financial data display.
+    - **Mobile Redesign:** Revamped the mobile trading view (`TradeLayoutMobile.vue`) to optimize space, ensuring the order form and order book occupy 50% of the screen height. Reduced padding across elements for a more compact and streamlined appearance.
+    - **Compact Order Form:** Minimized button sizes ("Buy" and "Sell" in `OrderForm.mobile.vue`) and redesigned input fields for a more compact and user-friendly experience. Removed unnecessary labels, integrating text directly into placeholders, and refined styling with smaller fonts and tighter spacing.
+    - **Button Styling:** Updated "Buy" and "Sell" buttons to an angular design by removing `border-radius`.
+- **Application Settings:**
+    - Centralized storage of the last selected trading pair and active market in `settingsStore.ts`.
+    - `TradeLayoutDefault.vue` and `CurrentPrice.vue` now use `settingsStore` to retrieve and save the last trading pair, ensuring state persistence across reloads.
+    - `MarketPicker.vue` now uses `settingsStore` to manage the active market and the "Show Favorites Only" flag, making these settings persistent.
 
+v1.0.1
+- **Bug Fixes:**
+    - Added protection against `undefined` values in the `removeAssetPrefix` function (`format.ts`), preventing crashes when handling asset symbols.
+- **Connection Stability:**
+    - Refactored `nodeStore.ts` to ensure full and correct re-subscription to all blockchain events after a successful node reconnection. This resolves issues with "stuck" block updates and infinite reconnection loops.
+    - Update ConnectionOverlay to display nodes and modify reconnect logic
+- **Market Depth Chart:** Completely rebuilt the market depth chart from scratch using SVG for superior performance and visual clarity. The new implementation resolves multiple data inversion and display bugs, features interactive tooltips, and includes properly scaled and labeled price/volume axes. A dedicated caching layer was also implemented to prevent data conflicts with other components.
+- **Implemented a new "Transfer" modal** for sending any available asset to another BitShares user.
 - **Enhanced Key Security & Code Refactoring:** Significantly improved key generation security by implementing Key Stretching (PBKDF2 with 40,000 iterations using SHA512) for password-derived keys. The password generation logic has been refactored and centralized in `accountStore.ts` for better maintainability and clearer separation of concerns.
 - **Localization:** Added support for multiple languages including Chinese (cn), German (de), Spanish (es), French (fr), Portuguese (pt), and Arabic (ar) in addition to existing English (en) and Russian (ru)
 - **Tauri Integration:** Added support for Rust-based UI framework (Tauri) which provides significantly faster performance and better efficiency compared to Electron
@@ -43,7 +62,7 @@ v1.0.1
 - Gateway Integration: Enabled dynamic selection of blockchain networks for deposits and withdrawals.
 - Gateway Integration: Implemented address validation for gateway deposits and withdrawals.
 - Gateway Integration: Added caching for deposit addresses to improve user experience.
-- Implemented a new "Transfer" modal for sending any available asset to another BitShares user.
+- **Asset Cost Calculation & Fix:** Implemented a robust system to calculate and display the real-time value of each asset in the user's portfolio in USDT. This includes cross-currency conversion (e.g., via BTS if direct USDT trading is unavailable). Crucially, a critical bug causing price inversion and erroneous, highly inflated asset valuations in the portfolio has been identified and fixed.
 - Transfer modal features a two-step process: input details (recipient, amount, optional memo) and transaction confirmation.
 - Transfer modal utilizes `transactionStore.prepareTransfer` and `transactionStore.broadcastTransaction` for secure transfers.
 - Transfer modal includes a check for sufficient BTS balance to cover transaction fees, preventing failed transfers.
